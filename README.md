@@ -27,24 +27,18 @@ Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trư
   - Gồm **3,352 ảnh** cho việc **Train** và **813 ảnh** cho việc **Test**
   - Bộ dataset CSV có thuộc tính bao gồm: tên, tình trạng, giá, vị trí, mô tả, năm sản xuất,mẫu mã, số km đã đi, loại động cơ, công suất, và nhiều thông tin liên quan khác
 
-### 2. Phân tích tổng quan
-#### Biến định tính
-- **Xuất xứ**: 57.2% xe lắp ráp trong nước, 42.8% nhập khẩu
-- **Tình trạng**: 79.9% xe đã qua sử dụng, 20.1% xe mới
-- **Loại xe**: Phổ biến nhất là Sedan và SUV
-- **Hộp số**: 80% hộp số tự động, 18.4% số tay
-- **Dẫn động**: Dẫn động cầu trước là phổ biến nhất
-- **Nhiên liệu**: Xăng chiếm tỷ lệ cao nhất, tiếp theo là dầu
+### 2. Convolutional Neural Network (CNN)
 
-### 3. Phân tích biểu đồ
-- **Bản đồ nhiệt**: Phân tích sự phổ biến của các loại xe theo tỉnh thành
-- **Biểu đồ phân phối**: Xác định phân bố của các thuộc tính như số km đã đi, giá xe
-- **Biểu đồ cột, tròn, đường**: So sánh các tiêu chí khác nhau như hãng xe, loại xe
+### 3. Linear Regression
 
-### 5. Nguồn tham khảo
+---
+
+## Nguồn tham khảo
 - [Nguồn dữ liệu trên Kaggle - Giá xe](https://www.kaggle.com/datasets/qucvinhdng/automobile-dataset)
 - [Nguồn dữ liệu trên Kaggle - Ảnh xe](https://www.kaggle.com/code/kshitij192/car-images-classification-using-cnn/data)
 - [Source Code](https://github.com/ptnghia3502/PPR501-car-analysis)
+
+---
 
 ## Tác giả
 - **Giảng viên**: Nguyễn Xuân Sâm
@@ -52,5 +46,3 @@ Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trư
   - Phạm Trọng Nghĩa - 26MS23417
   - Trần Công Vinh - 26MS23406 
   - Trần Quang Duy - 26MS23410
-
----
