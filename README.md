@@ -8,7 +8,7 @@
 
 Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trường ô tô tại Việt Nam thông qua các biểu đồ.
 
-Library: keras, tensorflow, matplotlib, gradio, numpy.
+**Library**: keras, tensorflow, matplotlib, gradio, numpy.
 
 ---
 
@@ -18,7 +18,7 @@ Library: keras, tensorflow, matplotlib, gradio, numpy.
 - **Nguồn dữ liệu**: Kaggle
 - **Giấy phép**: MIT
 - **Thông tin dữ liệu**:
-  - Gồm `3,352 ảnh` cho việc **Train** và `813 ảnh` cho việc **Test**
+  - Gồm **3,352 ảnh** cho việc **Train** và **813 ảnh** cho việc **Test**
   - Bộ dataset có thuộc tính bao gồm: tên, tình trạng, giá, vị trí, mô tả, năm sản xuất,mẫu mã, số km đã đi, loại động cơ, công suất, và nhiều thông tin liên quan khác
 
 ### 2. Phân tích tổng quan
