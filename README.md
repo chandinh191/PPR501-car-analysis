@@ -22,10 +22,10 @@ Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trư
 
 ### 1. Giới thiệu về dữ liệu
 - **Nguồn dữ liệu**: Kaggle
-- **Giấy phép**: MIT
+- **License**: MIT
 - **Thông tin dữ liệu**:
   - Gồm **3,352 ảnh** cho việc **Train** và **813 ảnh** cho việc **Test**
-  - Bộ dataset có thuộc tính bao gồm: tên, tình trạng, giá, vị trí, mô tả, năm sản xuất,mẫu mã, số km đã đi, loại động cơ, công suất, và nhiều thông tin liên quan khác
+  - Bộ dataset CSV có thuộc tính bao gồm: tên, tình trạng, giá, vị trí, mô tả, năm sản xuất,mẫu mã, số km đã đi, loại động cơ, công suất, và nhiều thông tin liên quan khác
 
 ### 2. Phân tích tổng quan
 #### Biến định tính
