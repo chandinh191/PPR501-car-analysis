@@ -26,7 +26,7 @@ https://www.kaggle.com/code/kshitij192/car-images-classification-using-cnn/data
 
 ---
 
-### Hướng dẫn chạy notebook `main.ipynb`
+### Hướng dẫn chạy notebook `CNN/main.ipynb`
 
 Các bước dưới đây dành cho Windows.
 
@@ -36,7 +36,7 @@ Giữ nguyên notebook và thư mục dữ liệu theo cấu trúc sau. Mỗi th
 
 ```text
 sources/
-├── main.ipynb
+├── CNN/main.ipynb
 └── Dataset/
     ├── Train/
     │   ├── Audi/
@@ -46,14 +46,14 @@ sources/
         └── ...
 ```
 
-Notebook đọc dữ liệu bằng các đường dẫn tương đối `Dataset/Train` và `Dataset/Test`, vì vậy hãy chạy notebook với thư mục làm việc là `sources`.
+Notebook đọc dữ liệu bằng các đường dẫn tương đối `Dataset/Train` và `Dataset/Test`, vì vậy hãy chạy notebook với thư mục làm việc là `sources\CNN`.
 
 #### 2. Tạo môi trường Python
 
 Python 3.10 hoặc 3.11 được khuyến nghị. Mở PowerShell tại thư mục gốc của repository và chạy:
 
 ```powershell
-cd .\sources
+cd .\sources\CNN
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
@@ -68,13 +68,13 @@ py -m ipykernel install --user --name car-analysis --display-name "Python (car-a
 
 #### 4. Mở notebook
 
-Khởi chạy JupyterLab hoặc VS Code tại thư mục `sources`:
+Khởi chạy JupyterLab hoặc VS Code tại thư mục `sources\CNN`:
 
 ```powershell
 jupyter lab main.ipynb
 ```
 
-Nếu dùng Visual Studio Code, mở thư mục `sources`, mở `main.ipynb`, rồi chọn kernel **Python (car-analysis)**. Đảm bảo thư mục làm việc của notebook là `sources` để các đường dẫn dataset ở bước 1 hoạt động.
+Nếu dùng Visual Studio Code, mở thư mục `sources\CNN`, mở `main.ipynb`, rồi chọn kernel **Python (car-analysis)**. Đảm bảo thư mục làm việc của notebook là `sources\CNN` để các đường dẫn dataset ở bước 1 hoạt động.
 
 #### 5. Chạy notebook từ đầu đến cuối
 
@@ -88,6 +88,6 @@ Khi chạy xong, các cell tiếp theo đánh giá model, hiển thị biểu đ
 
 #### Lỗi thường gặp
 
-* **Không tìm thấy `Dataset/Train` hoặc `Dataset/Test`:** chạy notebook với thư mục làm việc là `sources` và kiểm tra tên thư mục `Dataset`, `Train`, `Test`.
+* **Không tìm thấy `Dataset/Train` hoặc `Dataset/Test`:** chạy notebook với thư mục làm việc là `sources\CNN` và kiểm tra tên thư mục `Dataset`, `Train`, `Test`.
 * **Không tìm thấy TensorFlow hoặc Gradio:** chọn đúng kernel **Python (car-analysis)**; cài lại thư viện trong chính môi trường `.venv`.
 * **PowerShell không cho kích hoạt `.venv`:** dùng trực tiếp `.\.venv\Scripts\python.exe -m pip install ...` và chọn interpreter `sources\.venv\Scripts\python.exe` làm kernel.
