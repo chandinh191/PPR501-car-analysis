@@ -54,23 +54,21 @@ Python 3.10 hoặc 3.11 được khuyến nghị. Mở PowerShell tại thư m�
 
 ```powershell
 cd .\sources
-py -3.11 -m venv .venv
+py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
-
-Nếu PowerShell chặn kích hoạt môi trường, có thể chạy các lệnh cài đặt ở bước tiếp theo bằng `.\.venv\Scripts\python.exe` thay cho `python`.
 
 #### 3. Cài các thư viện cần thiết
 
 ```powershell
-python -m pip install --upgrade pip
-python -m pip install tensorflow numpy matplotlib gradio pillow ipykernel jupyterlab
-python -m ipykernel install --user --name car-analysis --display-name "Python (car-analysis)"
+py -m pip install --upgrade pip
+py -m pip install tensorflow numpy matplotlib gradio pillow ipykernel jupyterlab
+py -m ipykernel install --user --name car-analysis --display-name "Python (car-analysis)"
 ```
 
 #### 4. Mở notebook
 
-Khởi chạy JupyterLab ngay trong thư mục `sources`:
+Khởi chạy JupyterLab hoặc VS Code tại thư mục `sources`:
 
 ```powershell
 jupyter lab main.ipynb
@@ -80,7 +78,7 @@ Nếu dùng Visual Studio Code, mở thư mục `sources`, mở `main.ipynb`, r�
 
 #### 5. Chạy notebook từ đầu đến cuối
 
-Chọn **Run All** hoặc chạy lần lượt từng cell từ trên xuống dưới, không bỏ qua các cell tạo dữ liệu và model. Cell đầu notebook cài Gradio; có thể đợi cell này hoàn tất trước khi chạy tiếp. Notebook sẽ nạp ảnh train/test, xây dựng CNN và huấn luyện trong **20 epoch**. Thời gian chạy tùy cấu hình máy; không đóng kernel trong lúc huấn luyện.
+Chọn **Run All** hoặc chạy lần lượt từng cell từ trên xuống dưới, không bỏ qua các cell tạo dữ liệu và model. Cell đầu notebook cài Gradio; có thể đợi cell này hoàn tất trước khi chạy tiếp. Notebook sẽ nạp ảnh train/test, xây dựng CNN và training trong **20 epoch**. Thời gian chạy tùy cấu hình máy; không đóng kernel trong lúc training.
 
 Khi chạy xong, các cell tiếp theo đánh giá model, hiển thị biểu đồ và khởi chạy giao diện dự đoán ảnh.
 
@@ -88,7 +86,7 @@ Khi chạy xong, các cell tiếp theo đánh giá model, hiển thị biểu đ
 
 Ở cell cuối, chờ Gradio khởi động rồi mở URL được in ra trong output để tải ảnh xe lên và xem kết quả phân loại. Notebook hiện gọi Gradio với `share=True`, vì vậy nó có thể tạo một URL công khai tạm thời; không tải lên ảnh riêng tư hoặc nhạy cảm. Dừng server bằng cách ngắt cell/kernel đang chạy.
 
-#### Khắc phục lỗi thường gặp
+#### Lỗi thường gặp
 
 * **Không tìm thấy `Dataset/Train` hoặc `Dataset/Test`:** chạy notebook với thư mục làm việc là `sources` và kiểm tra tên thư mục `Dataset`, `Train`, `Test`.
 * **Không tìm thấy TensorFlow hoặc Gradio:** chọn đúng kernel **Python (car-analysis)**; cài lại thư viện trong chính môi trường `.venv`.

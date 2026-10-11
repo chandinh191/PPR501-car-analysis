@@ -49,8 +49,8 @@ Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trư
 ## Tác giả
 - **Giảng viên**: Nguyễn Xuân Sâm
 - **Thành viên**:
-  - Phạm Trọng Nghĩa
-  - Trần Công Vinh
-  - Trần Quang Duy
+  - Phạm Trọng Nghĩa - 26MS23417
+  - Trần Công Vinh - 26MS23406 
+  - Trần Quang Duy - 26MS23410
 
 ---
