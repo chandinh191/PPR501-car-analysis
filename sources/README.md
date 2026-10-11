@@ -1,40 +1,95 @@
 # Car-Classification
 
-### Description :
+---
 
-* <p align = "justify">Built a model which is designed to classify the cars into seven categories that is Audi, Hyundai Creta, Mahindra Scorpio, Rolls Royce, Maruti Suzuki Swift, Tata Safari and Toyota Innova.</p>
+### Tổng quát :
 
-* <p align = "justify">Here, the input image of the car is given to the model and the model classifies it among the seven categories and displays the result to the users.</p>
+* <p align = "justify">Xây dựng một model có khả năng phân loại xe thành bảy nhóm: Audi, Hyundai Creta, Mahindra Scorpio, Rolls Royce, Maruti Suzuki Swift, Tata Safari và Toyota Innova.</p>
 
-### Requirements :
+* <p align = "justify">Người dùng cung cấp ảnh xe làm đầu vào; model sẽ phân loại ảnh vào một trong bảy nhóm trên và hiển thị kết quả.</p>
 
-* Python
-* Numpy
-* TensorFlow
-* Keras
-* Matplotlib
-* Gradio
+---
 
-### Methodology :
+### Phương thức :
 
-* <p align = "justify">This system is built using the Convolution Neural Network (CNN) model for classifying the cars on the image that is given as the input. The accuracy of the model is increased by increasing the number of epochs that is given to the model.</p>
+* <p align = "justify">Hệ thống sử dụng model Convolutional Neural Network (CNN) để phân loại xe trong ảnh đầu vào. Model được huấn luyện qua nhiều epoch để học các đặc trưng của từng nhóm xe và cải thiện độ chính xác.</p>
 
-* <p align = "justify">ImageDataGenerator is used here so that the model will become more robust as it trains on images that are slightly distorted and it helps to prevent the model from learning noise in the data such as where features are located in the image.</p>
+* <p align = "justify">ImageDataGenerator tạo các biến thể ảnh bằng cách áp dụng những phép biến đổi nhẹ trong quá trình huấn luyện. Việc này giúp model tăng khả năng tổng quát hóa và giảm nguy cơ học thuộc các nhiễu hoặc vị trí đặc trưng cố định trong dữ liệu.</p>
 
-* <p align = "justify">This model is trained and tested on a set of image data of the seven category of cars and are used to classify the cars into its categories of the unseen image data that are given by the users.</p>
+* <p align = "justify">Model được huấn luyện và đánh giá trên tập ảnh của bảy nhóm xe. Sau khi huấn luyện, model có thể dự đoán nhóm xe cho những ảnh mới chưa xuất hiện trong dữ liệu huấn luyện do người dùng cung cấp.</p>
+
+---
 
 ### Dataset :
 
 https://www.kaggle.com/code/kshitij192/car-images-classification-using-cnn/data
 
-### Deployment :
+---
 
-Gradio is the tool that is used for the deployment process and here, the images can be uploaded and predicted by the users.</p>
+### Hướng dẫn chạy notebook `main.ipynb`
 
-https://huggingface.co/spaces/Harin-6044/Car_Classification
+Các bước dưới đây dành cho Windows.
 
-### Screenshots :
+#### 1. Kiểm tra dữ liệu
 
-![01](https://user-images.githubusercontent.com/79094361/214892556-9cf444ce-7e58-44a5-83a6-aa15b657bb3f.png)
+Giữ nguyên notebook và thư mục dữ liệu theo cấu trúc sau. Mỗi thư mục con trong `Train` và `Test` là một nhãn xe:
 
-![02](https://user-images.githubusercontent.com/79094361/214892615-796cffb2-d023-496c-827b-d821ca393923.png)
+```text
+sources/
+├── main.ipynb
+└── Dataset/
+    ├── Train/
+    │   ├── Audi/
+    │   └── ...
+    └── Test/
+        ├── Audi/
+        └── ...
+```
+
+Notebook đọc dữ liệu bằng các đường dẫn tương đối `Dataset/Train` và `Dataset/Test`, vì vậy hãy chạy notebook với thư mục làm việc là `sources`.
+
+#### 2. Tạo môi trường Python
+
+Python 3.10 hoặc 3.11 được khuyến nghị. Mở PowerShell tại thư mục gốc của repository và chạy:
+
+```powershell
+cd .\sources
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Nếu PowerShell chặn kích hoạt môi trường, có thể chạy các lệnh cài đặt ở bước tiếp theo bằng `.\.venv\Scripts\python.exe` thay cho `python`.
+
+#### 3. Cài các thư viện cần thiết
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install tensorflow numpy matplotlib gradio pillow ipykernel jupyterlab
+python -m ipykernel install --user --name car-analysis --display-name "Python (car-analysis)"
+```
+
+#### 4. Mở notebook
+
+Khởi chạy JupyterLab ngay trong thư mục `sources`:
+
+```powershell
+jupyter lab main.ipynb
+```
+
+Nếu dùng Visual Studio Code, mở thư mục `sources`, mở `main.ipynb`, rồi chọn kernel **Python (car-analysis)**. Đảm bảo thư mục làm việc của notebook là `sources` để các đường dẫn dataset ở bước 1 hoạt động.
+
+#### 5. Chạy notebook từ đầu đến cuối
+
+Chọn **Run All** hoặc chạy lần lượt từng cell từ trên xuống dưới, không bỏ qua các cell tạo dữ liệu và model. Cell đầu notebook cài Gradio; có thể đợi cell này hoàn tất trước khi chạy tiếp. Notebook sẽ nạp ảnh train/test, xây dựng CNN và huấn luyện trong **20 epoch**. Thời gian chạy tùy cấu hình máy; không đóng kernel trong lúc huấn luyện.
+
+Khi chạy xong, các cell tiếp theo đánh giá model, hiển thị biểu đồ và khởi chạy giao diện dự đoán ảnh.
+
+#### 6. Dùng giao diện dự đoán
+
+Ở cell cuối, chờ Gradio khởi động rồi mở URL được in ra trong output để tải ảnh xe lên và xem kết quả phân loại. Notebook hiện gọi Gradio với `share=True`, vì vậy nó có thể tạo một URL công khai tạm thời; không tải lên ảnh riêng tư hoặc nhạy cảm. Dừng server bằng cách ngắt cell/kernel đang chạy.
+
+#### Khắc phục lỗi thường gặp
+
+* **Không tìm thấy `Dataset/Train` hoặc `Dataset/Test`:** chạy notebook với thư mục làm việc là `sources` và kiểm tra tên thư mục `Dataset`, `Train`, `Test`.
+* **Không tìm thấy TensorFlow hoặc Gradio:** chọn đúng kernel **Python (car-analysis)**; cài lại thư viện trong chính môi trường `.venv`.
+* **PowerShell không cho kích hoạt `.venv`:** dùng trực tiếp `.\.venv\Scripts\python.exe -m pip install ...` và chọn interpreter `sources\.venv\Scripts\python.exe` làm kernel.
