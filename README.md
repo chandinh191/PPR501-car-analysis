@@ -8,7 +8,13 @@
 
 Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trường ô tô tại Việt Nam thông qua các biểu đồ.
 
-**Library**: keras, tensorflow, matplotlib, gradio, numpy.
+**Library**:
+* Python
+* Numpy
+* TensorFlow
+* Keras
+* Matplotlib
+* Gradio
 
 ---
 
