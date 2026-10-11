@@ -4,9 +4,11 @@
 
 # Nhận Diện Và Phân Tích Giá Xe Hơi Ở Việt Nam
 
-Đây là dự án trực quan hóa dữ liệu, tập trung vào việc phân tích giá cả xe hơi ở Việt Nam (1990-2023), sử dụng **Tableau**. 
+Đây là dự án trực quan hóa dữ liệu, tập trung vào việc phân tích giá cả xe hơi ở Việt Nam (1990-2023).
 
 Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trường ô tô tại Việt Nam thông qua các biểu đồ.
+
+Library: keras, tensorflow, matplotlib, gradio, numpy.
 
 ---
 
