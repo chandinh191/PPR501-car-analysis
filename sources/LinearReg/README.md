@@ -9,3 +9,6 @@ cd sources\LinearReg
 py linear_regression.py # Simple diagram
 py -m streamlit run app.py # Run local app
 ```
+
+# Test
+App running on: `http://localhost:8501`
