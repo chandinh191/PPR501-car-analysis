@@ -3,6 +3,7 @@
 ---
 
 # Nhận Diện Và Phân Tích Giá Xe Hơi Ở Việt Nam
+Eng: Support System for Car Recognition, Valuation, and Recommendation in Vietnam
 
 Đây là dự án trực quan hóa dữ liệu, tập trung vào việc phân tích giá cả xe hơi ở Việt Nam (1990-2023).
 
