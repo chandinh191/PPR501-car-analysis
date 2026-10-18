@@ -84,7 +84,7 @@ with st.sidebar:
 # --------------------------------------------------
 
 with st.expander("Preview dataset", expanded=False):
-    st.dataframe(dataset.head(100), use_container_width=True)
+    st.dataframe(dataset.head(100), width='stretch')
 
 
 # --------------------------------------------------
@@ -108,8 +108,8 @@ available_columns = [
 ]
 
 default_x = (
-    "Năm sản xuất:"
-    if "Năm sản xuất:" in available_columns
+    "Năm sản xuất"
+    if "Năm sản xuất" in available_columns
     else available_columns[0]
 )
 

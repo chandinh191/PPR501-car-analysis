@@ -31,15 +31,15 @@ dataset["Price_Million"] = dataset["Price"].apply(convert_price)
 
 # Use manufacturing year as input (X)
 # Use car price as output (Y)
-dataset["Năm sản xuất:"] = pd.to_numeric(
-    dataset["Năm sản xuất:"], errors="coerce"
+dataset["Năm sản xuất"] = pd.to_numeric(
+    dataset["Năm sản xuất"], errors="coerce"
 )
 
 dataset = dataset.dropna(
-    subset=["Năm sản xuất:", "Price_Million"]
+    subset=["Năm sản xuất", "Price_Million"]
 )
 
-x = dataset[["Năm sản xuất:"]].to_numpy()
+x = dataset[["Năm sản xuất"]].to_numpy()
 y = dataset["Price_Million"].to_numpy()
 
 # Train Linear Regression model
