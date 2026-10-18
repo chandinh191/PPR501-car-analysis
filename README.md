@@ -11,10 +11,12 @@ Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trư
 **Library**:
 * Python
 * Numpy
-* TensorFlow
+* Pandas
 * Keras
+* TensorFlow
 * Matplotlib
 * Gradio
+* Streamlit
 
 ---
 
