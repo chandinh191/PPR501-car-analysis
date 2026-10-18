@@ -1,0 +1,12 @@
+# Shared dependencies for CNN, LinearReg, and Transformer apps
+tensorflow
+numpy
+pandas
+matplotlib
+scikit-learn
+gradio
+pillow
+streamlit
+sentence-transformers
+jupyterlab
+ipykernel
