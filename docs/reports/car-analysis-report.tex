@@ -1,0 +1,122 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\begin{document}
+
+\title{Nhận diện và phân tích giá xe hơi ở Việt Nam}
+\titlerunning{Phân tích dữ liệu ô tô Việt Nam}
+
+\author{Phạm Trọng Nghĩa\inst{1} \and
+Trần Công Vinh\inst{1} \and
+Trần Quang Duy\inst{1}}
+\authorrunning{P. T. Nghĩa et al.}
+
+\institute{Học phần PPR501, FSB-MSA\\
+\email{Giảng viên hướng dẫn: Nguyễn Xuân Sâm}}
+
+\maketitle
+
+\begin{abstract}
+Báo cáo trình bày dự án phân tích dữ liệu ô tô tại Việt Nam thông qua hai hướng tiếp cận: ước lượng giá xe bằng Linear Regression và phân loại ảnh xe bằng Convolutional Neural Network (CNN). Phần phân tích giá sử dụng dữ liệu rao bán xe, chuyển giá từ các đơn vị ``Tỷ'' và ``Triệu'' sang triệu đồng, sau đó xây dựng đường hồi quy giữa năm sản xuất và giá. Ứng dụng Streamlit cho phép xem dữ liệu, lựa chọn biến đầu vào và mục tiêu, huấn luyện model, quan sát RMSE và $R^2$, xem biểu đồ cũng như thử dự đoán trong phạm vi dữ liệu. Phần nhận diện ảnh sử dụng 3.352 ảnh train và 813 ảnh test thuộc bảy nhóm xe; ảnh được đổi về kích thước $256 \times 256$ và đưa vào CNN để phân loại. Notebook ghi nhận accuracy test khoảng 68,76\% sau 20 epoch. Kết quả minh họa khả năng kết hợp phân tích dữ liệu có cấu trúc và thị giác máy tính trong một đề tài ô tô. Báo cáo cũng nêu rõ các giới hạn đánh giá và sai khác tên cột cần khắc phục để việc chạy lại được tin cậy hơn.
+\keywords{Phân tích dữ liệu \and Ô tô \and Linear Regression \and CNN \and Streamlit \and Gradio}
+\end{abstract}
+
+\section{Giới thiệu}
+
+Thị trường ô tô có thể được khảo sát qua dữ liệu rao bán và hình ảnh phương tiện. Dự án ``PPR501 Car Analysis'' tổ chức hai bài toán bổ trợ nhau: phân tích mối liên hệ giữa năm sản xuất và giá xe, đồng thời nhận diện nhóm xe từ ảnh. Mục tiêu là tạo ra các công cụ trình diễn trực quan, giúp người dùng quan sát dữ liệu, xem kết quả model và thử dự đoán.
+
+Phần hồi quy nằm trong thư mục \texttt{LinearReg} bên trong \texttt{sources}; phần phân loại ảnh nằm trong thư mục \texttt{CNN}. Phần hồi quy gồm script tạo biểu đồ và ứng dụng Streamlit. Phần CNN được trình bày dưới dạng Jupyter Notebook và giao diện dự đoán Gradio.
+
+\section{Dữ liệu}
+
+\subsection{Dữ liệu giá xe}
+
+Dự án sử dụng tệp \texttt{car-price.csv} lấy từ Kaggle. Tệp có 15.442 dòng và 17 cột, bao gồm giá, năm sản xuất, số kilomet đã đi, tình trạng, xuất xứ, kiểu dáng, động cơ và các thuộc tính tin đăng khác. README mô tả dữ liệu bao phủ giai đoạn 1990--2023. Trước khi hồi quy, giá dạng văn bản được quy đổi về triệu đồng Việt Nam: phần ``Tỷ'' được nhân với 1.000 rồi cộng phần ``Triệu''.
+
+\subsection{Dữ liệu ảnh xe}
+
+Bộ dữ liệu ảnh được chia thành hai tập theo cấu trúc thư mục: 3.352 ảnh train và 813 ảnh test. Mỗi thư mục con là một nhãn, gồm Audi, Hyundai Creta, Mahindra Scorpio, Rolls Royce, Swift, Tata Safari và Toyota Innova. Notebook đọc ảnh theo kích thước $256 \times 256$, chuẩn hóa pixel về khoảng $[0,1]$ và áp dụng xoay ảnh, lật ngang để tăng cường dữ liệu train.
+
+\section{Phương pháp}
+
+\subsection{Ước lượng giá bằng Linear Regression}
+
+Script \texttt{linear\_regression.py} dùng năm sản xuất làm biến đầu vào $X$ và giá theo triệu đồng làm biến mục tiêu $Y$. Linear Regression khớp một đường thẳng có dạng:
+\begin{equation}
+\widehat{Y} = \beta_1 X + \beta_0,
+\end{equation}
+trong đó $\beta_1$ là hệ số góc và $\beta_0$ là hệ số chặn. Script tính RMSE và $R^2$ trên các quan sát đã dùng để khớp model, vẽ dữ liệu thực cùng đường hồi quy, rồi minh họa dự đoán cho xe sản xuất năm 2022.
+
+Ứng dụng Streamlit mở rộng thao tác này bằng cách cho phép chọn cột đầu vào và cột mục tiêu. Các giá trị dạng chữ được chuyển sang số bằng cách trích xuất số đầu tiên trong chuỗi; các dòng không chuyển đổi được sẽ bị loại khỏi phần dữ liệu dùng để train. Sau khi người dùng nhấn nút train, ứng dụng hiển thị phương trình, RMSE, $R^2$, biểu đồ và một ô nhập để dự đoán.
+
+\subsection{Phân loại ảnh bằng CNN}
+
+Notebook \texttt{sources/CNN/main.ipynb} nạp ảnh từ hai thư mục train và test, sau đó xây dựng model CNN tuần tự. Kiến trúc gồm hai lớp convolution (mỗi lớp 32 bộ lọc) xen kẽ với max pooling, tiếp theo là Flatten, hai lớp Dense (96 và 32 units), Dropout 0,30 và lớp softmax bảy đầu ra. Model dùng Adam optimizer, Sparse Categorical Crossentropy và accuracy làm metric, rồi được huấn luyện trong 20 epoch.
+
+Sau huấn luyện, notebook tính loss và accuracy trên tập test, trực quan hóa các đường học và cung cấp giao diện Gradio để người dùng tải ảnh lên. Giao diện notebook bật \texttt{share=True}, có thể tạo liên kết truy cập công khai trong thời gian server hoạt động.
+
+\section{Kết quả}
+
+\subsection{Kết quả CNN}
+
+Output đã lưu trong notebook ghi nhận accuracy test xấp xỉ 68,76\% và loss khoảng 1,1721 sau 20 epoch. Đây là kết quả của lần chạy được lưu trong notebook, không phải phép đo độc lập được lặp lại trong quá trình biên soạn báo cáo.
+
+\subsection{Minh họa hồi quy}
+
+Hình~\ref{fig:regression} là biểu đồ hồi quy giá xe tại Việt Nam có trong tài liệu dự án. Ứng dụng mới cũng vẽ scatter plot của dữ liệu đang chọn và đường dự đoán tương ứng.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\textwidth]{../imgs/vietnam-car-price-regression.png}
+\caption{Minh họa phân tích giá xe theo năm sản xuất.}
+\label{fig:regression}
+\end{figure}
+
+\section{Thảo luận và giới hạn}
+
+\begin{itemize}
+\item Mô hình hồi quy hiện dùng một biến số trong script minh họa, nên không thể biểu diễn đầy đủ tác động của tình trạng xe, số kilomet đã đi, xuất xứ và các yếu tố khác đến giá.
+\item RMSE và $R^2$ của script hồi quy được tính trên chính dữ liệu đã train. Ứng dụng Streamlit cũng mô tả $R^2$ là mức độ phù hợp trên dữ liệu train. Vì chưa có tập validation/test độc lập cho hồi quy, các metric này chưa cho biết đầy đủ khả năng dự đoán trên tin đăng mới.
+\item Cột năm trong CSV là \texttt{Năm sản xuất}, trong khi script \texttt{linear\_regression.py} đang truy cập \texttt{Năm sản xuất:}. Sai khác dấu hai chấm này cần được đồng bộ trước khi chạy lại script; nếu không, việc truy cập cột có thể thất bại.
+\item Notebook CNN dùng cùng tập test làm \texttt{validation\_data} trong quá trình train và tiếp tục gọi \texttt{evaluate} trên tập đó. Ngoài ra, pipeline test cũng bật xoay và lật ngẫu nhiên. Vì vậy, kết quả test cần được diễn giải thận trọng; nên dành validation riêng và chỉ chuẩn hóa (không tăng cường ngẫu nhiên) cho tập test cuối cùng.
+\item Streamlit chuyển các cột văn bản thành số bằng cách lấy số đầu tiên tìm được. Cách này hữu ích cho bản demo nhưng không thay thế bước thiết kế đặc trưng phù hợp cho các biến phân loại.
+\end{itemize}
+
+\section{Kết luận}
+
+Dự án kết hợp Linear Regression để khảo sát quan hệ giữa năm sản xuất và giá xe với CNN để nhận diện bảy loại xe từ hình ảnh. Streamlit hỗ trợ tương tác với dữ liệu giá và thử dự đoán; Gradio cung cấp giao diện tải ảnh và xem kết quả phân loại. Các kết quả hiện có phù hợp với mục tiêu trình diễn của đề tài. Để tăng độ tin cậy, các bước tiếp theo nên đồng bộ tên cột, chuẩn hóa quy trình tách tập dữ liệu, đánh giá trên dữ liệu chưa dùng khi train và lưu lại cấu hình cùng metric của từng lần chạy.
+
+\begin{credits}
+\subsubsection{\ackname}
+Nhóm xin cảm ơn giảng viên Nguyễn Xuân Sâm đã hướng dẫn nhóm trong học phần PPR501.
+
+\subsubsection{\discintname}
+Nhóm không có xung đột lợi ích cần công bố.
+\end{credits}
+
+\begin{thebibliography}{3}
+
+\bibitem{carprice}
+Kaggle: Automobile Dataset (Vietnam car prices).
+\url{https://www.kaggle.com/datasets/qucvinhdng/automobile-dataset}
+(truy cập ngày 18 tháng 10 năm 2026)
+
+\bibitem{carimages}
+Kshitij: Car Images Classification using CNN -- Dataset. Kaggle.
+\url{https://www.kaggle.com/code/kshitij192/car-images-classification-using-cnn/data}
+(truy cập ngày 18 tháng 10 năm 2026)
+
+\bibitem{repository}
+Nhóm PPR501: PPR501 Car Analysis. GitHub repository.
+\url{https://github.com/ptnghia3502/PPR501-car-analysis}
+(truy cập ngày 18 tháng 10 năm 2026)
+
+\end{thebibliography}
+
+\end{document}
