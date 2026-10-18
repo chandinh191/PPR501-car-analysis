@@ -1,14 +1,4 @@
-# Install package
-```python
-py -m pip install streamlit pandas numpy matplotlib scikit-learn
-```
-
-# Run app
-```python
-cd sources\LinearReg
-py linear_regression.py # Simple diagram
-py -m streamlit run app.py # Run local app
-```
-
-# Test
-App running on: `http://localhost:8501`
+For the shared environment setup and commands to run this application, see the
+repository-level [SETUP.md](../../SETUP.md). Install dependencies from the
+repository-root `requirements.txt`; do not install a separate per-app package
+set.
