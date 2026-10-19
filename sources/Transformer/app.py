@@ -213,6 +213,10 @@ with col2:
 # =============================================================================
 st.subheader("✍️ Nhập Mô Tả Chiếc Xe Của Bạn")
 
+# Khởi tạo session state cho ô nhập
+if "car_description" not in st.session_state:
+    st.session_state["car_description"] = ""
+
 # Các ví dụ mẫu để người dùng tham khảo
 st.markdown("**💡 Ví dụ mẫu (click để dùng):**")
 example_cols = st.columns(3)
@@ -337,8 +341,10 @@ if df_hcm is not None and len(df_hcm) > 0:
         s = str(price_str).strip()
         ty = re.search(r"([\d.,]+)\s*Tỷ", s, re.IGNORECASE)
         tr = re.search(r"([\d.,]+)\s*Triệu", s, re.IGNORECASE)
+
         def f(m):
             return float(m.group(1).replace(",", "."))
+
         return (f(ty) * 1000 if ty else 0) + (f(tr) if tr else 0)
 
     df_hcm["Price_Million"] = df_hcm["Price"].apply(to_million)
@@ -375,6 +381,6 @@ if df_hcm is not None and len(df_hcm) > 0:
 # =============================================================================
 st.divider()
 st.caption(
-    "🚗 Dự án môn PPR501 | Phương pháp: Transformer (DistilBERT Multilingual) "
-    "| Dataset: car-price.csv | Khu vực: TP. Hồ Chí Minh"
+    "📚 Đồ án môn PPR501 | Mô hình: DistilBERT Multilingual + Linear Ensemble | "
+    "Dữ liệu: car-price.csv | Khu vực: TP. Hồ Chí Minh"
 )

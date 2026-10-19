@@ -3,6 +3,7 @@
 ---
 
 # Nhận Diện Và Phân Tích Giá Xe Hơi Ở Việt Nam
+Eng: Support System for Car Recognition, Valuation, and Recommendation in Vietnam
 
 Đây là dự án trực quan hóa dữ liệu, tập trung vào việc phân tích giá cả xe hơi ở Việt Nam (1990-2023).
 
@@ -11,10 +12,12 @@ Mục tiêu của dự án là cung cấp cái nhìn tổng quan về thị trư
 **Library**:
 * Python
 * Numpy
-* TensorFlow
+* Pandas
 * Keras
+* TensorFlow
 * Matplotlib
 * Gradio
+* Streamlit
 
 ---
 

@@ -160,3 +160,10 @@ nohup py -m streamlit run app.py --server.port 8501 --server.address 0.0.0.0 &
 - **Bài toán:** Dự báo (Prediction) - Hồi quy (Regression)
 - **Khu vực:** TP. Hồ Chí Minh
 - **Đối tượng:** Người dân TP.HCM, salon xe cũ
+
+---
+
+For the shared environment setup and commands to run this application, see the
+repository-level [SETUP.md](../../SETUP.md). Install dependencies from the
+repository-root `requirements.txt`; do not install a separate per-app package
+set.
