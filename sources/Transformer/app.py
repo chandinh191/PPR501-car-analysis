@@ -14,6 +14,21 @@ from sentence_transformers import SentenceTransformer
 
 st.set_page_config(page_title="Car Chatbot", page_icon="🚗", layout="wide")
 
+st.markdown("""
+<style>
+    .block-container {
+        max-width: 75%;
+        margin: 0 auto;
+    }
+
+    [data-testid="stBottom"] {
+        width: 75%;
+        left: 12.5%;
+        right: auto;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 DATASET_PATH = Path(__file__).resolve().parent.parent / "Dataset" / "car-price.csv"
 MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 TOP_K = 5
