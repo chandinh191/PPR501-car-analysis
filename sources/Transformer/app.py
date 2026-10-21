@@ -12,6 +12,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sentence_transformers import SentenceTransformer
 
+import hashlib
+import json
+from PIL import Image
+
 st.set_page_config(page_title="Car Chatbot", page_icon="🚗", layout="wide")
 
 st.markdown("""
@@ -30,9 +34,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 DATASET_PATH = Path(__file__).resolve().parent.parent / "Dataset" / "car-price.csv"
-MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+MODEL_NAME = "Qwen/Qwen3-Embedding-0.6B"
 TOP_K = 5
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+# CNN image recognition
+CNN_DATASET_DIR = Path(__file__).resolve().parent.parent / "Dataset"
+CNN_TRAIN_DIR = CNN_DATASET_DIR / "Train"
+CNN_TEST_DIR = CNN_DATASET_DIR / "Test"
+
+CNN_MODEL_DIR = Path(__file__).resolve().parent / "models"
+CNN_MODEL_PATH = CNN_MODEL_DIR / "car_classifier.keras"
+CNN_METADATA_PATH = CNN_MODEL_DIR / "metadata.json"
+
+CNN_IMAGE_SIZE = (180, 180)
+CNN_BATCH_SIZE = 32
+CNN_EPOCHS = 20
 
 
 def convert_price(value):
@@ -215,8 +232,8 @@ def load_dataset():
 
 
 @st.cache_resource(show_spinner=False)
-def load_text_model():
-    return SentenceTransformer(MODEL_NAME, device=DEVICE)
+def load_text_model(model_name):
+    return SentenceTransformer(model_name, device=DEVICE)
 
 
 def build_description(row, columns):
@@ -243,9 +260,8 @@ def searchable_columns(df):
 
 
 @st.cache_data(show_spinner=False)
-def cached_car_embedding_batch(descriptions):
-    # Cache embeddings in small batches so the UI can report progress.
-    model = load_text_model()
+def cached_car_embedding_batch(descriptions, model_name):
+    model = load_text_model(model_name)
     return model.encode(
         list(descriptions),
         normalize_embeddings=True,
@@ -253,7 +269,6 @@ def cached_car_embedding_batch(descriptions):
         show_progress_bar=False,
         convert_to_numpy=True,
     )
-
 
 def filter_candidates(question, dataset, *, apply_price=True, apply_year=True, apply_seats=True, apply_body=True):
     candidates = dataset.copy()
@@ -363,7 +378,7 @@ def recommend_cars(question, dataset):
 
     for batch_index, start in enumerate(range(0, len(all_texts), batch_size), start=1):
         batch = tuple(all_texts[start:start + batch_size])
-        embedding_batches.append(cached_car_embedding_batch(batch))
+        embedding_batches.append(cached_car_embedding_batch(batch, MODEL_NAME))
         percent = 5 + int(batch_index / total_batches * 75)
         progress.progress(
             percent,
@@ -371,9 +386,12 @@ def recommend_cars(question, dataset):
         )
 
     car_embeddings = np.vstack(embedding_batches)
-    text_model = load_text_model()
+    text_model = load_text_model(MODEL_NAME)
     query_embedding = text_model.encode(
-        [question], normalize_embeddings=True, convert_to_numpy=True
+        [question],
+        prompt_name="query",
+        normalize_embeddings=True,
+        convert_to_numpy=True,
     )[0]
     progress.progress(90, text="Đang so sánh và xếp hạng xe... 90%")
     candidates["Similarity"] = car_embeddings @ query_embedding
@@ -550,9 +568,194 @@ def process_text_question(question, dataset):
         st.caption(f"Khoảng giá: {low_text}–{high_text} triệu VND.")
 
 
+def get_cnn_dataset_signature():
+    # Detect changes in image files to decide whether retraining is needed.
+    hasher = hashlib.sha256()
+
+    for split_dir in [CNN_TRAIN_DIR, CNN_TEST_DIR]:
+        if not split_dir.is_dir():
+            raise FileNotFoundError(f"Không tìm thấy thư mục: {split_dir}")
+
+        image_files = sorted(
+            path for path in split_dir.rglob("*")
+            if path.is_file()
+            and path.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+        )
+
+        if not image_files:
+            raise ValueError(f"Không tìm thấy ảnh trong {split_dir}")
+
+        for path in image_files:
+            stat = path.stat()
+            relative_path = str(path.relative_to(CNN_DATASET_DIR))
+            hasher.update(
+                f"{relative_path}:{stat.st_size}:{stat.st_mtime_ns}".encode("utf-8")
+            )
+
+    return hasher.hexdigest()
+
+
+@st.cache_resource(show_spinner=False)
+def load_or_train_cnn(dataset_signature):
+    # TensorFlow is loaded only for image recognition.
+    import tensorflow as tf
+    from tensorflow.keras import layers, models
+
+    CNN_MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Reuse the model when the dataset has not changed.
+    if CNN_MODEL_PATH.exists() and CNN_METADATA_PATH.exists():
+        try:
+            with open(CNN_METADATA_PATH, "r", encoding="utf-8") as file:
+                metadata = json.load(file)
+
+            if metadata.get("dataset_signature") == dataset_signature:
+                model = tf.keras.models.load_model(CNN_MODEL_PATH)
+                return model, metadata["class_names"]
+        except (OSError, ValueError, KeyError):
+            pass
+
+    st.info("Đang huấn luyện CNN từ dữ liệu ảnh Train/Test...")
+
+    train_ds = tf.keras.utils.image_dataset_from_directory(
+        CNN_TRAIN_DIR,
+        image_size=CNN_IMAGE_SIZE,
+        batch_size=CNN_BATCH_SIZE,
+        label_mode="int",
+        shuffle=True,
+        seed=42,
+    )
+
+    test_ds = tf.keras.utils.image_dataset_from_directory(
+        CNN_TEST_DIR,
+        image_size=CNN_IMAGE_SIZE,
+        batch_size=CNN_BATCH_SIZE,
+        label_mode="int",
+        shuffle=False,
+    )
+
+    class_names = train_ds.class_names
+
+    if test_ds.class_names != class_names:
+        raise ValueError(
+            "Các lớp ảnh trong Train và Test không khớp nhau. "
+            f"Train: {class_names}; Test: {test_ds.class_names}"
+        )
+
+    if len(class_names) < 2:
+        raise ValueError("CNN cần ít nhất hai lớp xe để huấn luyện.")
+
+    autotune = tf.data.AUTOTUNE
+
+    augmentation = tf.keras.Sequential([
+        layers.RandomFlip("horizontal"),
+        layers.RandomRotation(0.04),
+        layers.RandomZoom(0.08),
+    ])
+
+    def prepare_train(images, labels):
+        images = augmentation(images, training=True)
+        return images / 255.0, labels
+
+    def prepare_test(images, labels):
+        return images / 255.0, labels
+
+    train_ds = train_ds.map(
+        prepare_train, num_parallel_calls=autotune
+    ).prefetch(autotune)
+
+    test_ds = test_ds.map(
+        prepare_test, num_parallel_calls=autotune
+    ).prefetch(autotune)
+
+    model = models.Sequential([
+        layers.Input(shape=(*CNN_IMAGE_SIZE, 3)),
+        layers.Conv2D(32, 3, padding="same", activation="relu"),
+        layers.MaxPooling2D(),
+        layers.Conv2D(64, 3, padding="same", activation="relu"),
+        layers.MaxPooling2D(),
+        layers.Conv2D(128, 3, padding="same", activation="relu"),
+        layers.MaxPooling2D(),
+        layers.Conv2D(128, 3, padding="same", activation="relu"),
+        layers.GlobalAveragePooling2D(),
+        layers.Dropout(0.3),
+        layers.Dense(128, activation="relu"),
+        layers.Dropout(0.25),
+        layers.Dense(len(class_names), activation="softmax"),
+    ])
+
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            monitor="val_accuracy",
+            patience=5,
+            restore_best_weights=True,
+        ),
+    ]
+
+    model.fit(
+        train_ds,
+        validation_data=test_ds,
+        epochs=CNN_EPOCHS,
+        callbacks=callbacks,
+        verbose=1,
+    )
+
+    test_loss, test_accuracy = model.evaluate(test_ds, verbose=0)
+    model.save(CNN_MODEL_PATH)
+
+    with open(CNN_METADATA_PATH, "w", encoding="utf-8") as file:
+        json.dump({
+            "dataset_signature": dataset_signature,
+            "class_names": class_names,
+            "test_accuracy": float(test_accuracy),
+        }, file, ensure_ascii=False, indent=2)
+
+    st.success(f"CNN đã huấn luyện xong. Test accuracy: {test_accuracy:.2%}")
+
+    return model, class_names
+
+
+def recognize_car_image(uploaded_file, model, class_names):
+    # Hỗ trợ cả ảnh upload và ảnh PIL đã mở
+    if isinstance(uploaded_file, Image.Image):
+        image = uploaded_file.convert("RGB")
+    else:
+        image = Image.open(uploaded_file).convert("RGB")
+
+    image = image.resize(CNN_IMAGE_SIZE)
+
+    image_array = np.array(image, dtype=np.float32) / 255.0
+    image_array = np.expand_dims(image_array, axis=0)
+
+    predictions = model.predict(image_array, verbose=0)
+    predicted_index = int(np.argmax(predictions[0]))
+    confidence = float(predictions[0][predicted_index])
+
+    predicted_class = class_names[predicted_index]
+
+    return predicted_class, confidence
+
 def main():
     st.title("Support System for Car Recognition, Valuation, and Recommendation in Vietnam")
     st.caption("Tìm xe theo nhu cầu và phân tích giá cả trên thị trường Việt Nam.")
+
+    cnn_model = None
+    cnn_class_names = []
+
+    try:
+        dataset_signature = get_cnn_dataset_signature()
+
+        with st.spinner("Đang kiểm tra mô hình nhận diện ảnh..."):
+            cnn_model, cnn_class_names = load_or_train_cnn(dataset_signature)
+
+    except Exception as error:
+        st.warning(f"Chưa thể khởi tạo CNN: {error}")
 
     st.caption(f"Model: {MODEL_NAME.split('/')[-1]}")
 
@@ -565,32 +768,109 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    # Display chat history.
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+            if message.get("type") == "image_result":
+                st.write(f"**Xe được nhận diện:** {message['car_name']}")
+                st.write(f"**Độ tin cậy:** {message['confidence']:.1%}")
+            else:
+                st.markdown(message["content"])
+
+            if message.get("image") is not None:
+                st.image(
+                    message["image"],
+                    caption="Ảnh xe đã tải lên",
+                    width=300,
+                )
+
             if message.get("type") == "text_result":
                 with st.spinner("Đang hiển thị kết quả..."):
                     process_text_question(message["question"], dataset)
 
-    question = st.chat_input("Nhập yêu cầu tìm xe...")
-    if question is None:
+    # Text prompt and image upload share the same chat input.
+    prompt_data = st.chat_input(
+        "Nhập yêu cầu tìm xe hoặc tải ảnh xe...",
+        accept_file="multiple",
+        file_type=["jpg", "jpeg", "png", "webp", "bmp"],
+    )
+
+    if prompt_data is None:
         return
 
-    question = question.strip()
-    if not question:
+    question = (prompt_data.text or "").strip()
+    uploaded_files = prompt_data.files
+
+    if not question and not uploaded_files:
         return
 
-    st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user"):
-        st.markdown(question)
-    with st.chat_message("assistant"):
-        process_text_question(question, dataset)
+    image = None
+    car_name = None
+    confidence = None
+
+    if uploaded_files:
+        uploaded_file = uploaded_files[0]
+
+        try:
+            image = Image.open(uploaded_file).convert("RGB")
+            image.load()
+        except Exception:
+            st.error("File tải lên không phải ảnh hợp lệ.")
+            return
+
+        if cnn_model is None:
+            st.error("Mô hình CNN chưa sẵn sàng để nhận diện ảnh.")
+            return
+
+        try:
+            with st.spinner("Đang nhận diện xe từ ảnh..."):
+                car_name, confidence = recognize_car_image(
+                    image.copy(),
+                    cnn_model,
+                    cnn_class_names,
+                )
+        except Exception as error:
+            st.error(f"Không thể nhận diện ảnh: {error}")
+            return
+
+        if not question:
+            question = "Nhận diện xe trong ảnh"
+
     st.session_state.messages.append({
-        "role": "assistant",
-        "content": "Đã tìm và hiển thị các xe phù hợp cùng biểu đồ Linear Regression.",
-        "type": "text_result",
-        "question": question,
+        "role": "user",
+        "content": question,
+        "image": image.copy() if image is not None else None,
     })
+
+    with st.chat_message("user"):
+        if question:
+            st.markdown(question)
+        if image is not None:
+            st.image(image, caption="Ảnh xe đã tải lên", width=300)
+
+    with st.chat_message("assistant"):
+        if image is not None:
+            st.success(f"**Xe được nhận diện:** {car_name}")
+            st.write(f"**Độ tin cậy:** {confidence:.1%}")
+
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": f"Xe được nhận diện: {car_name}",
+                "type": "image_result",
+                "car_name": car_name,
+                "confidence": confidence,
+            })
+
+        # Chỉ tìm xe khi không upload ảnh.
+        if image is None and question:
+            process_text_question(question, dataset)
+
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": "Đã tìm và hiển thị các xe phù hợp cùng biểu đồ Linear Regression.",
+                "type": "text_result",
+                "question": question,
+            })
 
 if __name__ == "__main__":
     main()
