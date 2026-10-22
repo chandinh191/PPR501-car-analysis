@@ -235,6 +235,9 @@ sources/Transformer/transformer_result.png
 sources/Transformer/training_loss.png
 sources/LinearReg/*.png
 sources/CNN/*.h5
+sources/CNN/outputs/
+sources/CNN/logs/
+sources/CNN/__pycache__/
 
 # Python virtual environments
 .venv/
