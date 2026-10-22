@@ -500,7 +500,7 @@ def display_results(results, dataset, brand=None):
                 ax_year.grid(True, alpha=0.25)
                 ax_year.legend(fontsize=8)
                 fig_year.tight_layout()
-                st.pyplot(fig_year, use_container_width=True)
+                st.pyplot(fig_year, width='stretch')
                 plt.close(fig_year)
                 if np.isfinite(year_r2):
                     st.caption(f"Số tin đăng: {len(year_data):,} · R²: {year_r2:.3f}")
@@ -549,7 +549,7 @@ def display_results(results, dataset, brand=None):
                 ax_mileage.grid(True, alpha=0.25)
                 ax_mileage.legend(fontsize=8)
                 fig_mileage.tight_layout()
-                st.pyplot(fig_mileage, use_container_width=True)
+                st.pyplot(fig_mileage, width='stretch')
                 plt.close(fig_mileage)
                 if np.isfinite(mileage_r2):
                     st.caption(f"Số tin đăng: {len(mileage_data):,} · R²: {mileage_r2:.3f}")
