@@ -6,7 +6,7 @@ This repository contains three independently run applications:
 | --- | --- | --- |
 | `sources/CNN` | CNN image classifier (MobileNetV2) with a Gradio UI | `python .\sources\CNN\train_cnn.py --mode serve` |
 | `sources/LinearReg` | Linear Regression plot and Streamlit UI | See [Linear Regression](#4-run-the-linear-regression-app) |
-| `sources/Transformer` | Transformer-based car recommendation chatbot | `streamlit run .\sources\Transformer\app.py --server.port 8502` |
+| `sources/Transformer` | Transformer-based car recommendation chatbot | See [Transformer chatbot](#5-run-the-transformer-recommendation-chatbot) |
 
 All Python libraries for the three apps are listed in the single root
 [`requirements.txt`](./requirements.txt). Create one virtual environment at the
@@ -140,6 +140,8 @@ Close the Matplotlib window to finish the script.
 
 ## 5. Run the Transformer recommendation chatbot
 
+### Streamlit interface
+
 From the repository root, with the shared `.venv` activated:
 
 ```powershell
@@ -151,6 +153,21 @@ The first run downloads the `paraphrase-multilingual-MiniLM-L12-v2` model from
 Hugging Face, so internet access is required; later runs can reuse the cached
 model.
 
+### Jupyter notebook
+
+The notebook provides the same dataset filtering and Transformer ranking flow
+as `app.py`, displaying the top matches in a table. From the repository root,
+with the shared `.venv` activated:
+
+```powershell
+Set-Location .\sources\Transformer
+jupyter lab .\main.ipynb
+```
+
+Select the **Python (PPR501 Car Analysis)** kernel, run the cells in order, and
+enter a car request in the final cell. The notebook also downloads the model
+from Hugging Face the first time it runs.
+
 ## Running the apps together
 
 Each app runs as its own process. Start it in a separate terminal and leave
@@ -161,7 +178,7 @@ that terminal open. The default ports in the commands above are:
 * CNN Gradio: the local URL/port printed by Gradio (normally `7860`)
 
 Stop each app with `Ctrl+C` in its terminal, or stop the active notebook cell
-for CNN.
+for CNN or Transformer.
 
 ## Troubleshooting
 

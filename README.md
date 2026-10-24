@@ -58,6 +58,21 @@ python train_cnn.py --mode serve        # http://localhost:7860
 
 ![Linear Regression](./docs/imgs/vietnam-car-price-regression.png)
 
+## 4. Transformer (Chatbot gợi ý xe)
+
+- Source: `sources/Transformer`
+
+Ứng dụng chatbot Streamlit sử dụng **Sentence-Transformers embedding** để lọc và
+xếp hạng xe theo mô tả tiếng Việt của người dùng, kèm nhận diện ảnh xe bằng CNN
+và gợi ý giá bán bằng **Linear Regression**.
+
+```bash
+cd sources/Transformer
+streamlit run app.py --server.port 8502   # http://localhost:8502
+```
+
+- Notebook: [`sources/Transformer/main.ipynb`](./sources/Transformer/main.ipynb)
+
 ---
 
 # Nguồn tham khảo
